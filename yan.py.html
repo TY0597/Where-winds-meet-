@@ -1,0 +1,136 @@
+<html>
+<head>
+<title>yan.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #067d17;}
+.s3 { color: #1750eb;}
+.s4 { color: #0037a6;}
+.s5 { color: #8c8c8c; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+yan.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">tkinter </span><span class="s0">as </span><span class="s1">tk</span>
+<span class="s0">import </span><span class="s1">random</span>
+<span class="s0">import </span><span class="s1">time</span>
+<span class="s0">import </span><span class="s1">sys</span>
+
+
+<span class="s0">class </span><span class="s1">TipApp:</span>
+    <span class="s0">def </span><span class="s1">__init__(self):</span>
+        <span class="s1">self.batch_windows = []</span>
+        <span class="s1">self.single_window = </span><span class="s0">None</span>
+
+    <span class="s0">def </span><span class="s1">show_single_tip(self):</span>
+        <span class="s1">self.single_window = tk.Tk()</span>
+        <span class="s1">self.single_window.title(</span><span class="s2">&quot;专属提示&quot;</span><span class="s1">)</span>
+
+        <span class="s1">screen_width = self.single_window.winfo_screenwidth()</span>
+        <span class="s1">screen_height = self.single_window.winfo_screenheight()</span>
+        <span class="s1">window_width = </span><span class="s3">350</span>
+        <span class="s1">window_height = </span><span class="s3">120</span>
+        <span class="s1">x = (screen_width - window_width) // </span><span class="s3">2</span>
+        <span class="s1">y = (screen_height - window_height) // </span><span class="s3">2</span>
+        <span class="s1">self.single_window.geometry(</span><span class="s2">f&quot;</span><span class="s4">{</span><span class="s1">window_width</span><span class="s4">}</span><span class="s2">x</span><span class="s4">{</span><span class="s1">window_height</span><span class="s4">}</span><span class="s2">+</span><span class="s4">{</span><span class="s1">x</span><span class="s4">}</span><span class="s2">+</span><span class="s4">{</span><span class="s1">y</span><span class="s4">}</span><span class="s2">&quot;</span><span class="s1">)</span>
+
+        <span class="s5"># 初始提示语</span>
+        <span class="s1">tip = </span><span class="s2">&quot;上号上号上号上号&quot;</span>
+        <span class="s1">bg = </span><span class="s2">&quot;skyblue&quot;</span>
+        <span class="s1">tk.Label(</span>
+            <span class="s1">self.single_window,</span>
+            <span class="s1">text=tip,</span>
+            <span class="s1">bg=bg,</span>
+            <span class="s1">width=</span><span class="s3">40</span><span class="s1">,</span>
+            <span class="s1">height=</span><span class="s3">3</span><span class="s1">,</span>
+            <span class="s1">wraplength=</span><span class="s3">320</span><span class="s1">,</span>
+            <span class="s1">justify=</span><span class="s2">'center'</span>
+        <span class="s1">).pack()</span>
+
+        <span class="s1">self.single_window.bind(</span><span class="s2">'&lt;space&gt;'</span><span class="s1">, self.on_space_global)</span>
+        <span class="s1">self.single_window.attributes(</span><span class="s2">'-topmost'</span><span class="s1">, </span><span class="s0">True</span><span class="s1">)</span>
+
+        <span class="s1">self.single_window.protocol(</span><span class="s2">&quot;WM_DELETE_WINDOW&quot;</span><span class="s1">, self.start_batch_tips)</span>
+        <span class="s1">self.single_window.mainloop()</span>
+
+    <span class="s0">def </span><span class="s1">create_batch_windows(self, count):</span>
+        <span class="s0">if </span><span class="s1">count &lt;= </span><span class="s3">0</span><span class="s1">:</span>
+            <span class="s0">return</span>
+
+        <span class="s1">window = tk.Toplevel()</span>
+        <span class="s1">self.batch_windows.append(window)</span>
+
+        <span class="s1">screen_width = window.winfo_screenwidth()</span>
+        <span class="s1">screen_height = window.winfo_screenheight()</span>
+
+        <span class="s1">window_width = </span><span class="s3">350</span>
+        <span class="s1">window_height = </span><span class="s3">120</span>
+
+        <span class="s1">x = random.randint(</span><span class="s3">0</span><span class="s1">, screen_width - window_width)</span>
+        <span class="s1">y = random.randint(</span><span class="s3">0</span><span class="s1">, screen_height - window_height)</span>
+        <span class="s1">window.title(</span><span class="s2">'温馨提示'</span><span class="s1">)</span>
+        <span class="s1">window.geometry(</span><span class="s2">f&quot;</span><span class="s4">{</span><span class="s1">window_width</span><span class="s4">}</span><span class="s2">x</span><span class="s4">{</span><span class="s1">window_height</span><span class="s4">}</span><span class="s2">+</span><span class="s4">{</span><span class="s1">x</span><span class="s4">}</span><span class="s2">+</span><span class="s4">{</span><span class="s1">y</span><span class="s4">}</span><span class="s2">&quot;</span><span class="s1">)</span>
+
+        <span class="s1">tips = [</span>
+            <span class="s2">'开刀房开刀房'</span><span class="s1">,</span>
+            <span class="s2">'打觉吗？'</span><span class="s1">,</span>
+            <span class="s2">'插旗！！'</span><span class="s1">,</span>
+            <span class="s2">'打止戈吗？'</span><span class="s1">,</span>
+            <span class="s2">'一起打本吗？'</span><span class="s1">,</span>
+            <span class="s2">'来高级'</span><span class="s1">,</span>
+            <span class="s2">'群策吗？'</span><span class="s1">,</span>
+            <span class="s2">'燕吗？'</span><span class="s1">,</span>
+            <span class="s2">'今晚通宵'</span><span class="s1">,</span>
+            <span class="s2">'不准下线！'</span><span class="s1">,</span>
+            <span class="s2">'我要杀生道魁'</span><span class="s1">,</span>
+            <span class="s2">'我是废物让我一把'</span><span class="s1">,</span>
+            <span class="s2">'我师傅能单刷十人本！'</span>
+        <span class="s1">]</span>
+        <span class="s1">tip = random.choice(tips)</span>
+        <span class="s1">bg_color = [</span>
+            <span class="s2">'lightpink'</span><span class="s1">, </span><span class="s2">'skyblue'</span><span class="s1">, </span><span class="s2">'lightgreen'</span><span class="s1">, </span><span class="s2">'lavender'</span><span class="s1">,</span>
+            <span class="s2">'lightyellow'</span><span class="s1">, </span><span class="s2">'plum'</span><span class="s1">, </span><span class="s2">'coral'</span><span class="s1">, </span><span class="s2">'bisque'</span><span class="s1">, </span><span class="s2">'aquamarine'</span>
+        <span class="s1">]</span>
+        <span class="s1">bg = random.choice(bg_color)</span>
+
+        <span class="s1">tk.Label(window, text=tip, bg=bg, font=(</span><span class="s2">'微软黑体'</span><span class="s1">, </span><span class="s3">14</span><span class="s1">),</span>
+                 <span class="s1">width=</span><span class="s3">40</span><span class="s1">, height=</span><span class="s3">3</span><span class="s1">, wraplength=</span><span class="s3">320</span><span class="s1">, justify=</span><span class="s2">'center'</span><span class="s1">).pack()</span>
+
+        <span class="s1">window.bind(</span><span class="s2">'&lt;space&gt;'</span><span class="s1">, self.on_space_global)</span>
+        <span class="s1">window.attributes(</span><span class="s2">'-topmost'</span><span class="s1">, </span><span class="s0">True</span><span class="s1">)</span>
+
+        <span class="s0">if </span><span class="s1">count &gt; </span><span class="s3">1</span><span class="s1">:</span>
+            <span class="s1">window.after(</span><span class="s3">50</span><span class="s1">, self.create_batch_windows, count - </span><span class="s3">1</span><span class="s1">)</span>
+
+    <span class="s0">def </span><span class="s1">start_batch_tips(self):</span>
+        <span class="s0">if </span><span class="s1">self.single_window:</span>
+            <span class="s1">self.single_window.destroy()</span>
+            <span class="s1">self.single_window = </span><span class="s0">None</span>
+
+        <span class="s1">self.create_batch_windows(</span><span class="s3">100</span><span class="s1">)</span>
+
+    <span class="s0">def </span><span class="s1">on_space_global(self, event=</span><span class="s0">None</span><span class="s1">):</span>
+        <span class="s0">if </span><span class="s1">self.single_window:</span>
+            <span class="s1">self.single_window.destroy()</span>
+
+        <span class="s0">for </span><span class="s1">window </span><span class="s0">in </span><span class="s1">self.batch_windows:</span>
+            <span class="s0">try</span><span class="s1">:</span>
+                <span class="s1">window.destroy()</span>
+            <span class="s0">except</span><span class="s1">:</span>
+                <span class="s0">pass</span>
+
+        <span class="s1">sys.exit()</span>
+
+
+<span class="s5"># 确保这行代码在类定义之外，没有任何缩进</span>
+<span class="s0">if </span><span class="s1">__name__ == </span><span class="s2">'__main__'</span><span class="s1">:</span>
+    <span class="s1">app = TipApp()</span>
+    <span class="s1">app.show_single_tip()      </span></pre>
+</body>
+</html>
