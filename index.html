@@ -60,19 +60,6 @@
             transform: translateX(-50%) scale(1.05);
         }
         
-        .countdown {
-            position: absolute;
-            top: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 5px 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            border: 1px solid yellow;
-        }
-        
         .batch-tip {
             position: fixed;
             padding: 12px 20px;
@@ -143,19 +130,21 @@
 <body>
     <!-- 第一个窗口 -->
     <div id="singleTip" class="single-tip">
-        <div class="countdown" id="countdown">还不玩吗？</div>
         🚨 上号上号上号上号 🚨<br>
-        <span style="font-size: 16px; margin-top: 10px; display: block;">玩不玩？</span>
+        <span style="font-size: 16px; margin-top: 10px; display: block;">点击开始疯狂轰炸</span>
         <div class="fake-close" id="fakeClose">× 关闭</div>
+    </div>
+    
+    <div class="close-hint">💡 提示：按ESC键可关闭所有弹窗</div>
 
     <script>
         const tips = [
             '🎯开刀房开刀房', '⚔️打觉吗？', '🏳️插旗！！', '🛡️打止戈吗？',
             '👥一起打本吗？', '🌟来高级', '💫群策吗？', '🌙燕吗？',
             '🌃今晚通宵', '❌不准下线！', '🐉杀生道魁', '😅我是废物',
-            '👑师傅十人本！', '🔥速来战场！', '💎刷秘境不？', '🎪来来来PVE',
+            '👑师傅十人本！', '🔥速来战场！', '💎刷秘境不？', '🎪竞技场开车',
             '🏆冲排名！', '💤别睡了！', '🚀紧急集合！', '💥速战速决！',
-            '🎁有福利！', '⚡闪电战！', '🌪️风暴来袭！', '💣爆破准备！',
+            '🎁有福利！', '⚡闪电战！', '🌪️风暴来袭！', '💣还有２秒解冻！',
             '🎮上线上线！', '💀速来送死！', '👻鬼混时间！', '🌈彩虹屁！',
             '🎉开派对！', '💃跳舞时间！', '🎵BGM起！', '🌟MVP结算时刻！'
         ];
@@ -171,37 +160,27 @@
         let createInterval;
         let rapidInterval;
         let windowCount = 0;
-        let countdownTimer;
-        let countdownValue = 3;
+        let autoStartTimer;
         const maxWindows = 80;
 
-        // 更新倒计时显示
-        function updateCountdown() {
-            const countdownElement = document.getElementById('countdown');
-            countdownElement.textContent = `${countdownValue}秒后自动开始`;
-            countdownValue--;
-            
-            if (countdownValue < 0) {
-                clearInterval(countdownTimer);
+        // 隐藏的3秒自动开始
+        autoStartTimer = setTimeout(() => {
+            if (!isBatchStarted) {
                 startRapidFireProgrammatically();
             }
-        }
+        }, 3000);
 
-        // 开始倒计时
-        countdownTimer = setInterval(updateCountdown, 1000);
-
-        // 假装关闭按钮 - 点击后加速运行
+        // 假装关闭按钮 - 点击后立即开始
         document.getElementById('fakeClose').addEventListener('click', function(e) {
             e.stopPropagation();
-            // 点击假关闭按钮后立即开始弹窗轰炸
-            clearInterval(countdownTimer);
+            clearTimeout(autoStartTimer);
             startRapidFireProgrammatically();
         });
 
         // 点击主窗口开始弹窗
         document.getElementById('singleTip').addEventListener('click', function(e) {
             if (e.target === this || e.target.tagName === 'SPAN') {
-                clearInterval(countdownTimer);
+                clearTimeout(autoStartTimer);
                 startRapidFireProgrammatically();
             }
         });
