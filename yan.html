@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专属提示</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .single-tip {
+            background: skyblue;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-size: 18px;
+        }
+        
+        .batch-tip {
+            position: fixed;
+            background: lightpink;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-size: 16px;
+            max-width: 300px;
+            word-wrap: break-word;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .close-btn {
+            background: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <div id="singleTip" class="single-tip">
+        上号上号上号上号
+    </div>
+    
+    <button onclick="startBatchTips()">开始批量提示</button>
+    <button class="close-btn" onclick="closeAll()">关闭所有 (点击空白处)</button>
+
+    <script>
+        const tips = [
+            '开刀房开刀房',
+            '打觉吗？',
+            '插旗！！',
+            '打止戈吗？',
+            '一起打本吗？',
+            '来高级',
+            '群策吗？',
+            '燕吗？',
+            '今晚通宵',
+            '不准下线！',
+            '我要杀生道魁',
+            '我是废物让我一把',
+            '我师傅能单刷十人本！'
+        ];
+
+        const colors = [
+            'lightpink', 'skyblue', 'lightgreen', 'lavender',
+            'lightyellow', 'plum', 'coral', 'bisque', 'aquamarine'
+        ];
+
+        let batchWindows = [];
+
+        function startBatchTips() {
+            // 隐藏单个提示
+            document.getElementById('singleTip').style.display = 'none';
+            
+            // 创建多个弹窗
+            for (let i = 0; i < 20; i++) {
+                createBatchWindow();
+            }
+        }
+
+        function createBatchWindow() {
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const windowDiv = document.createElement('div');
+            windowDiv.className = 'batch-tip';
+            windowDiv.textContent = tip;
+            windowDiv.style.background = color;
+            
+            // 随机位置
+            const x = Math.random() * (window.innerWidth - 300);
+            const y = Math.random() * (window.innerHeight - 100);
+            windowDiv.style.left = x + 'px';
+            windowDiv.style.top = y + 'px';
+            
+            document.body.appendChild(windowDiv);
+            batchWindows.push(windowDiv);
+            
+            // 添加点击关闭
+            windowDiv.addEventListener('click', function() {
+                this.remove();
+                batchWindows = batchWindows.filter(w => w !== this);
+            });
+        }
+
+        function closeAll() {
+            batchWindows.forEach(window => {
+                if (window.parentNode) {
+                    window.parentNode.removeChild(window);
+                }
+            });
+            batchWindows = [];
+            
+            // 重新显示单个提示
+            document.getElementById('singleTip').style.display = 'block';
+        }
+
+        // 点击页面空白处关闭所有
+        document.addEventListener('click', function(e) {
+            if (e.target === document.body || e.target.className === 'close-btn') {
+                closeAll();
+            }
+        });
+    </script>
+</body>
+</html>
