@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专属提示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .single-tip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #87CEEB, #98FB98);
+            padding: 40px 60px;
+            border-radius: 20px;
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            text-align: center;
+            cursor: pointer;
+            z-index: 1000;
+            border: 4px solid white;
+            animation: pulse 2s infinite;
+        }
+        
+        .batch-tip {
+            position: fixed;
+            padding: 20px 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            font-size: 18px;
+            font-weight: bold;
+            max-width: 250px;
+            word-wrap: break-word;
+            cursor: pointer;
+            z-index: 100;
+            animation: popIn 0.4s ease-out;
+            border: 2px solid white;
+            color: #333;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 第一个窗口 -->
+    <div id="singleTip" class="single-tip">
+        🎮 上号上号上号上号 🎮<br>
+        <span style="font-size: 16px; margin-top: 10px; display: block;">点击关闭此窗口开始弹窗</span>
+    </div>
+
+    <script>
+        const tips = [
+            '🎯 开刀房开刀房',
+            '⚔️ 打觉吗？',
+            '🏳️ 插旗！！',
+            '🛡️ 打止戈吗？',
+            '👥 一起打本吗？',
+            '🌟 来高级',
+            '💫 群策吗？',
+            '🌙 燕吗？',
+            '🌃 今晚通宵',
+            '❌ 不准下线！',
+            '🐉 我要杀生道魁',
+            '😅 我是废物让我一把',
+            '👑 我师傅能单刷十人本！',
+            '🔥 速来战场！',
+            '💎 刷秘境不？',
+            '🎪 竞技场开车',
+            '🏆 冲排名！',
+            '💤 别睡了，上线！'
+        ];
+
+        const colors = [
+            'linear-gradient(45deg, #FFB6C1, #FF69B4)',
+            'linear-gradient(45deg, #87CEEB, #00BFFF)',
+            'linear-gradient(45deg, #98FB98, #32CD32)',
+            'linear-gradient(45deg, #E6E6FA, #9370DB)',
+            'linear-gradient(45deg, #FFFACD, #FFD700)',
+            'linear-gradient(45deg, #DDA0DD, #BA55D3)',
+            'linear-gradient(45deg, #FFA07A, #FF6347)',
+            'linear-gradient(45deg, #FFE4B5, #FFA500)',
+            'linear-gradient(45deg, #7FFFD4, #00CED1)',
+            'linear-gradient(45deg, #FFA500, #FF4500)',
+            'linear-gradient(45deg, #BA55D3, #8A2BE2)',
+            'linear-gradient(45deg, #00FA9A, #00CED1)'
+        ];
+
+        let isBatchStarted = false;
+        let batchWindows = [];
+
+        // 点击第一个窗口开始弹窗
+        document.getElementById('singleTip').addEventListener('click', function() {
+            this.style.animation = 'popIn 0.3s ease-out reverse';
+            setTimeout(() => {
+                this.remove();
+                startBatchTips();
+            }, 300);
+        });
+
+        function startBatchTips() {
+            if (isBatchStarted) return;
+            isBatchStarted = true;
+            
+            // 持续创建弹窗
+            const createInterval = setInterval(() => {
+                if (batchWindows.length < 30) { // 控制最大数量
+                    createBatchWindow();
+                }
+            }, 500);
+            
+            // 随机移动现有弹窗
+            setInterval(() => {
+                batchWindows.forEach(window => {
+                    if (Math.random() > 0.7) {
+                        moveWindow(window);
+                    }
+                });
+            }, 1000);
+        }
+
+        function createBatchWindow() {
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const windowDiv = document.createElement('div');
+            windowDiv.className = 'batch-tip';
+            windowDiv.textContent = tip;
+            windowDiv.style.background = color;
+            windowDiv.style.animation = 'popIn 0.4s ease-out, float 3s ease-in-out infinite';
+            
+            // 随机位置
+            const x = Math.random() * (window.innerWidth - 250);
+            const y = Math.random() * (window.innerHeight - 100);
+            windowDiv.style.left = x + 'px';
+            windowDiv.style.top = y + 'px';
+            
+            document.body.appendChild(windowDiv);
+            batchWindows.push(windowDiv);
+            
+            // 点击关闭单个弹窗
+            windowDiv.addEventListener('click', function() {
+                this.style.animation = 'popIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    this.remove();
+                    batchWindows = batchWindows.filter(w => w !== this);
+                }, 300);
+            });
+        }
+
+        function moveWindow(window) {
+            const newX = Math.random() * (window.innerWidth - 250);
+            const newY = Math.random() * (window.innerHeight - 100);
+            window.style.transition = 'all 0.8s ease-in-out';
+            window.style.left = newX + 'px';
+            window.style.top = newY + 'px';
+        }
+
+        // 按ESC键关闭所有弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                batchWindows.forEach(window => {
+                    window.style.animation = 'popIn 0.3s ease-out reverse';
+                    setTimeout(() => {
+                        if (window.parentNode) {
+                            window.parentNode.removeChild(window);
+                        }
+                    }, 300);
+                });
+                batchWindows = [];
+            }
+        });
+    </script>
+</body>
+</html>
