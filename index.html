@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专属提示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .single-tip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #FF0000, #FF4500);
+            padding: 60px 100px;
+            border-radius: 25px;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+            box-shadow: 0 0 50px rgba(255,0,0,0.8);
+            text-align: center;
+            cursor: pointer;
+            z-index: 10000;
+            border: 5px solid yellow;
+            animation: shakeAndGrow 3s ease-in-out infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .fake-close {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 8px 25px;
+            border-radius: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 2px solid #ccc;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        
+        .fake-close:hover {
+            background: rgba(255,255,255,1);
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        .batch-tip {
+            position: fixed;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255,255,255,0.6);
+            font-size: 14px;
+            font-weight: bold;
+            max-width: 180px;
+            word-wrap: break-word;
+            cursor: pointer;
+            z-index: 1000;
+            animation: rapidPop 0.15s ease-out;
+            border: 2px solid rgba(255,255,255,0.8);
+            color: #000;
+            backdrop-filter: blur(2px);
+        }
+        
+        @keyframes shakeAndGrow {
+            0% { 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+                box-shadow: 0 0 30px red;
+            }
+            25% { 
+                transform: translate(-50%, -50%) scale(1.05) rotate(1deg); 
+                box-shadow: 0 0 40px orange;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.1) rotate(-1deg); 
+                box-shadow: 0 0 50px yellow;
+            }
+            75% { 
+                transform: translate(-50%, -50%) scale(1.05) rotate(1deg); 
+                box-shadow: 0 0 40px orange;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+                box-shadow: 0 0 30px red;
+            }
+        }
+        
+        @keyframes rapidPop {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            70% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 第一个窗口 - 简化版 -->
+    <div id="singleTip" class="single-tip">
+        🚨 上号上号上号上号 🚨
+        <div class="fake-close" id="fakeClose">× 关闭</div>
+    </div>
+
+    <script>
+        const tips = [
+            '🎯开刀房开刀房', '⚔️打觉吗？', '🏳️插旗！！', '🛡️打止戈吗？',
+            '👥一起打本吗？', '🌟来高级', '💫群策吗？', '🌙燕吗？',
+            '🌃今晚通宵', '❌不准下线！', '🐉杀生道魁', '😅我是废物',
+            '👑师傅十人本！', '🔥速来刀房！', '💎刷十人本不？', '🎪竞技场开车',
+            '🏆冲排名！', '💤别睡了！', '🚀快来组队！', '💥速战速决！',
+            '🎁有袅袅！', '⚡动作快点！', '🌪️风暴来袭！', '💣闪避准备！',
+            '🎮上线上线！', '💀速来送死！', '👻鬼混时间！', '🌈彩虹屁！',
+            '🎉快来高抽象！', '😔我侠缘呢？', '🎵BGM起！', '🌟MVP结算时刻！'
+        ];
+
+        const colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+            '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+            '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2',
+            '#A9DFBF', '#F9E79F', '#D5DBDB', '#FAD7A0', '#ABEBC6'
+        ];
+
+        let isBatchStarted = false;
+        let createInterval;
+        let rapidInterval;
+        let windowCount = 0;
+        let autoStartTimer;
+        const maxWindows = 80;
+
+        // 隐藏的3秒自动开始
+        autoStartTimer = setTimeout(() => {
+            if (!isBatchStarted) {
+                startRapidFireProgrammatically();
+            }
+        }, 3000);
+
+        // 假装关闭按钮 - 点击后立即开始
+        document.getElementById('fakeClose').addEventListener('click', function(e) {
+            e.stopPropagation();
+            clearTimeout(autoStartTimer);
+            startRapidFireProgrammatically();
+        });
+
+        // 点击主窗口开始弹窗
+        document.getElementById('singleTip').addEventListener('click', function(e) {
+            if (e.target === this) {
+                clearTimeout(autoStartTimer);
+                startRapidFireProgrammatically();
+            }
+        });
+
+        function startRapidFireProgrammatically() {
+            const singleTip = document.getElementById('singleTip');
+            singleTip.style.animation = 'rapidPop 0.1s ease-out reverse';
+            
+            setTimeout(() => {
+                if (singleTip.parentNode) {
+                    singleTip.parentNode.removeChild(singleTip);
+                }
+                startRapidFire();
+            }, 100);
+        }
+
+        function startRapidFire() {
+            if (isBatchStarted) return;
+            isBatchStarted = true;
+            
+            // 极速创建弹窗 - 每50ms创建一批
+            createInterval = setInterval(() => {
+                // 每次创建3-6个弹窗
+                const batchCount = Math.floor(Math.random() * 4) + 3;
+                for (let i = 0; i < batchCount; i++) {
+                    if (windowCount < maxWindows) {
+                        setTimeout(() => createRapidWindow(), i * 10);
+                    }
+                }
+            }, 50);
+            
+            // 超高速连续创建 - 每20ms创建1个
+            rapidInterval = setInterval(() => {
+                if (windowCount < maxWindows * 0.8) {
+                    createRapidWindow();
+                }
+            }, 20);
+            
+            // 自动清理，保持流畅
+            setInterval(cleanupWindows, 1000);
+        }
+
+        function createRapidWindow() {
+            const tip = tips[Math.floor(Math.random() * tips.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const windowDiv = document.createElement('div');
+            windowDiv.className = 'batch-tip';
+            windowDiv.textContent = tip;
+            windowDiv.style.background = color;
+            windowDiv.style.animation = 'rapidPop 0.1s ease-out';
+            
+            // 完全随机位置，覆盖整个屏幕
+            const x = Math.random() * (window.innerWidth - 150);
+            const y = Math.random() * (window.innerHeight - 60);
+            windowDiv.style.left = x + 'px';
+            windowDiv.style.top = y + 'px';
+            
+            // 随机旋转
+            const rotate = -5 + Math.random() * 10;
+            windowDiv.style.transform += ` rotate(${rotate}deg)`;
+            
+            document.body.appendChild(windowDiv);
+            windowCount++;
+            
+            // 点击关闭单个弹窗
+            windowDiv.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.style.animation = 'rapidPop 0.1s ease-out reverse';
+                setTimeout(() => {
+                    if (this.parentNode) {
+                        this.parentNode.removeChild(this);
+                        windowCount--;
+                    }
+                }, 100);
+            });
+            
+            // 5秒后自动消失
+            setTimeout(() => {
+                if (windowDiv.parentNode) {
+                    windowDiv.style.opacity = '0';
+                    windowDiv.style.transform += ' scale(0.5)';
+                    setTimeout(() => {
+                        if (windowDiv.parentNode) {
+                            windowDiv.parentNode.removeChild(windowDiv);
+                            windowCount--;
+                        }
+                    }, 200);
+                }
+            }, 5000);
+        }
+
+        function cleanupWindows() {
+            const windows = document.querySelectorAll('.batch-tip');
+            if (windows.length > maxWindows * 0.9) {
+                // 移除一些旧弹窗
+                const toRemove = Math.floor(windows.length * 0.3);
+                for (let i = 0; i < toRemove && i < windows.length; i++) {
+                    if (windows[i].parentNode) {
+                        windows[i].parentNode.removeChild(windows[i]);
+                        windowCount--;
+                    }
+                }
+            }
+        }
+
+        // 按ESC键关闭所有弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                clearInterval(createInterval);
+                clearInterval(rapidInterval);
+                const windows = document.querySelectorAll('.batch-tip');
+                windows.forEach(window => {
+                    window.style.animation = 'rapidPop 0.1s ease-out reverse';
+                    setTimeout(() => {
+                        if (window.parentNode) {
+                            window.parentNode.removeChild(window);
+                        }
+                    }, 100);
+                });
+                windowCount = 0;
+            }
+        });
+    </script>
+</body>
+</html>
